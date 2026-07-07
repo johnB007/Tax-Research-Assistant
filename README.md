@@ -1,27 +1,38 @@
 # Tax Research Assistant
 
-A local tax research tool built for multi-state household and small business scenarios. This application provides citation-backed research support for federal IRS guidance and state-specific tax law without requiring cloud dependencies or paid services.
+**Local tax research for W2 + business household scenarios** — Statement parsing, expense categorization, and Q&A with source citations. Works offline, no cloud dependencies.
 
-**Status:** v1.0.0 - Production ready with 116,516 indexed legal chunks from 2,742+ authoritative sources.
+Multi-state framework ready for 50+ states. Built with Streamlit, SQLite FTS5, and Tesseract OCR.
 
-## Critical Information
+**Status:** v1.0.0 — 116,516 indexed legal chunks from 2,742+ IRS and state tax sources.
 
-### This is a research tool, not legal/tax advice
+---
 
-1. This tool is for education and research only. It is not legal, tax, or accounting advice.
-2. Tax law changes annually. Always verify dates, forms, and dollar thresholds for your specific filing year before relying on any answer.
-3. Statements often contain mixed personal and business transactions. Final categorization requires receipt-level review by a qualified professional.
-4. Before filing, confirm all treatment with a licensed CPA or tax attorney.
+## What it does
 
-## What this tool is designed for
+- **Statement parsing**: PDF, CSV, and scanned image uploads (Chase, Amex, Wells Fargo, Costco, Amazon, etc.)
+- **Expense categorization**: 65+ IRS Schedule C rules for business deductions
+- **Tax research**: Q&A with citations from indexed IRS and state law (SC + Federal included)
+- **Filing profile aware**: Answers tailored to filing year, W2 income, LLC, S Corp, and quarterly payment scenarios
+- **Local & private**: Run entirely offline — no cloud uploads, no telemetry
+- **Multi-state ready**: Framework to add NY, TX, CA, etc. by configuration only
+- **LLM optional**: Works in retrieval-only mode; OpenAI integration for answer synthesis (not required)
 
-1. **W2 employee income**: You and spouse earning W2 wages.
-2. **Business activity**: Spouse-owned LLC and S Corp operations.
-3. **Quarterly tax payments**: Estimated tax liability planning and payment tracking.
-4. **Statement uploads**: Bank, credit card, and payment processor statements (CSV, PDF, scanned images).
-5. **Expense mapping**: Rule-based categorization of possible business deductions.
-6. **Citation research**: All answers reference indexed IRS and South Carolina legal sources with URLs.
-7. **Multi-state extensibility**: Framework ready for 50-state expansion via state configuration.
+---
+
+## Important: This is research only
+
+This tool is for **education and research** only. It is **not legal, tax, or accounting advice**. Tax law changes annually. Always confirm dates, thresholds, and treatment with a licensed CPA or tax attorney before filing. Statements contain mixed transactions — final categorization requires professional review.
+
+---
+
+## Designed for your scenario
+
+1. **You and spouse**: W2 income + spouse-owned LLC and S Corp
+2. **Quarterly estimates**: Track and plan estimated tax payments
+3. **Business spend**: Upload credit card, bank, and payment processor statements
+4. **Deduction research**: Find IRS guidance on what's deductible, ordinary, and necessary
+5. **Multi-year filing**: Set filing year (2026, 2025, 2024, 2023) and get year-aware answers
 
 ## What is included
 
