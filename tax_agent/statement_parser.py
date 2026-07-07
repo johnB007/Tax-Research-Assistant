@@ -34,7 +34,7 @@ try:
 except Exception:
     RapidOCR = None
 
-from tax_agent.expense_rules import classify_expense
+from tax_agent.expense_rules import assess_deductibility, classify_expense
 
 
 @dataclass
@@ -46,6 +46,8 @@ class Transaction:
     category: str
     confidence: float
     note: str
+    deductible_status: str
+    deductible_note: str
 
 
 DATE_PATTERNS = [
@@ -151,6 +153,7 @@ def _transactions_from_text(source_file: str, text: str) -> list[Transaction]:
             continue
 
         category, confidence, note = classify_expense(description)
+        deductible_status, deductible_note = assess_deductibility(category, description)
         transactions.append(
             Transaction(
                 source_file=source_file,
@@ -160,6 +163,8 @@ def _transactions_from_text(source_file: str, text: str) -> list[Transaction]:
                 category=category,
                 confidence=confidence,
                 note=note,
+                deductible_status=deductible_status,
+                deductible_note=deductible_note,
             )
         )
     return transactions
@@ -256,6 +261,7 @@ def parse_csv_statement(file_path: Path) -> list[Transaction]:
         if not description or amount is None:
             continue
         category, confidence, note = classify_expense(description)
+        deductible_status, deductible_note = assess_deductibility(category, description)
         transactions.append(
             Transaction(
                 source_file=file_path.name,
@@ -265,6 +271,8 @@ def parse_csv_statement(file_path: Path) -> list[Transaction]:
                 category=category,
                 confidence=confidence,
                 note=note,
+                deductible_status=deductible_status,
+                deductible_note=deductible_note,
             )
         )
 
@@ -333,6 +341,8 @@ def summarize_transactions(transactions: list[Transaction]) -> pd.DataFrame:
             "category": tx.category,
             "confidence": round(tx.confidence, 2),
             "note": tx.note,
+            "deductible_status": tx.deductible_status,
+            "deductible_note": tx.deductible_note,
         }
         for tx in transactions
     ]

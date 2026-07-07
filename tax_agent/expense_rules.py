@@ -146,6 +146,55 @@ def classify_expense(description: str) -> tuple[str, float, str]:
     return "General retail and miscellaneous", 0.45, "Auto mapped fallback category - review for business purpose"
 
 
+def assess_deductibility(category: str, description: str) -> tuple[str, str]:
+    normalized = _normalize_description(description)
+    cat = category.lower().strip()
+
+    if cat in {"credit card payment and transfers", "statement parsing artifact"}:
+        return "Not deductible", "Payment artifact or transfer, not a business expense"
+
+    if cat in {"medical and health expenses (review)"}:
+        return "Not deductible", "Medical spending is typically personal for business deduction purposes"
+
+    if cat in {"meals and entertainment"}:
+        return "Partially deductible", "Meals may be limited to partial deduction and require business purpose"
+
+    if cat in {"charitable contributions", "general retail and miscellaneous"}:
+        return "Review", "Deductibility depends on business purpose and supporting records"
+
+    likely_deductible = {
+        "advertising and marketing",
+        "vehicle expenses (fuel)",
+        "vehicle expenses (maintenance)",
+        "vehicle expenses (insurance)",
+        "office and operating supplies",
+        "software and subscriptions",
+        "travel expenses",
+        "travel expenses (lodging)",
+        "travel expenses (ground)",
+        "home office (utilities/internet)",
+        "home office (rent)",
+        "home office (mortgage interest)",
+        "utilities and communications",
+        "professional services (tax/accounting)",
+        "professional services (legal)",
+        "professional services",
+        "equipment and supplies",
+        "insurance and taxes",
+        "education and training",
+    }
+    if cat in likely_deductible:
+        return "Likely deductible", "Category is generally deductible with business purpose and documentation"
+
+    # Merchant-level hints for ambiguous categories.
+    if any(k in normalized for k in ("gas", "fuel", "shell", "exxon", "chevron", "bp", "circle k")):
+        return "Likely deductible", "Fuel spend may be deductible for business mileage use"
+    if any(k in normalized for k in ("parking", "toll", "theparkingspot", "parkingmgt")):
+        return "Likely deductible", "Parking and tolls may be deductible for business travel"
+
+    return "Review", "Needs manual review for business purpose and tax treatment"
+
+
 def _normalize_description(description: str) -> str:
     value = description.lower().strip()
 
