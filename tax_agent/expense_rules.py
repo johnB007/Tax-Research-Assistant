@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+import re
 
 
 @dataclass(frozen=True)
@@ -118,7 +119,7 @@ def classify_expense(description: str) -> tuple[str, float, str]:
     
     Longer, more specific keywords are checked first to avoid false positives.
     """
-    normalized = description.lower()
+    normalized = _normalize_description(description)
     
     # First pass: Check for multi-word phrases and specific terms
     specific_terms = [
@@ -136,5 +137,83 @@ def classify_expense(description: str) -> tuple[str, float, str]:
     for rule in RULES:
         if rule.keyword in normalized:
             return rule.category, rule.confidence, rule.note
-    
-    return "Unmapped", 0.35, "Requires manual categorization - review for business purpose"
+
+    # Third pass: Broad heuristic mapping to avoid uncategorized rows.
+    heuristic = _classify_by_heuristics(normalized)
+    if heuristic:
+        return heuristic
+
+    return "General retail and miscellaneous", 0.45, "Auto mapped fallback category - review for business purpose"
+
+
+def _normalize_description(description: str) -> str:
+    value = description.lower().strip()
+
+    # Remove common statement processor prefixes that block keyword matching.
+    prefixes = [
+        r"^tst\*",
+        r"^sq\s*\*",
+        r"^sp\s+",
+        r"^wm\s+",
+        r"^act\*",
+        r"^cpp\*",
+        r"^qdi\*",
+        r"^sat\s+",
+    ]
+    for pattern in prefixes:
+        value = re.sub(pattern, "", value)
+
+    # Remove phone numbers and collapse whitespace.
+    value = re.sub(r"\b\d{3}[- ]?\d{3}[- ]?\d{4}\b", " ", value)
+    value = re.sub(r"\s+", " ", value).strip()
+    return value
+
+
+def _classify_by_heuristics(normalized: str) -> tuple[str, float, str] | None:
+    if not normalized:
+        return ("General retail and miscellaneous", 0.4, "Blank description fallback category")
+
+    fuel_keywords = (
+        "gas", "fuel", "shell", "exxon", "mobil", "chevron", "bp", "circle k",
+        "sunoco", "racetrac", "murphy", "marathon", "quiktrip", "qt", "7-eleven",
+    )
+    if any(k in normalized for k in fuel_keywords):
+        return ("Vehicle expenses (fuel)", 0.8, "Fuel merchant inferred from description")
+
+    if any(k in normalized for k in ("parking", "toll", "theparkingspot", "parkingmgt")):
+        return ("Travel expenses (ground)", 0.78, "Parking or toll expense")
+
+    if any(k in normalized for k in ("airlines", "airl", "southwes", "spirit air")):
+        return ("Travel expenses", 0.78, "Air travel merchant inferred")
+
+    if any(k in normalized for k in ("hotel", "courtyard", "hilton", "marriott", "airbnb")):
+        return ("Travel expenses (lodging)", 0.8, "Lodging merchant inferred")
+
+    if any(k in normalized for k in ("restaurant", "cafe", "coffee", "chick-fil-a", "dunkin", "bagel", "pizza", "jersey mike", "whataburger", "cava")):
+        return ("Meals and entertainment", 0.7, "Food or dining merchant inferred")
+
+    if any(k in normalized for k in ("publix", "trader joe", "grocery", "h-e-b", "wal-mart", "walmart", "target", "supercenter")):
+        return ("Office and operating supplies", 0.55, "General retail merchant inferred - review business usage")
+
+    if any(k in normalized for k in ("lowes", "home depot", "hdwe", "hardware", "ace")):
+        return ("Equipment and supplies", 0.72, "Hardware or maintenance retailer inferred")
+
+    if any(k in normalized for k in ("walgreens", "cvs", "pharmacy", "diagnostics", "dental", "counseling", "md")):
+        return ("Medical and health expenses (review)", 0.6, "Health merchant inferred - verify deductibility")
+
+    if any(k in normalized for k in ("church", "seacoast church")):
+        return ("Charitable contributions", 0.75, "Donation or church payment inferred")
+
+    if any(k in normalized for k in ("school", "academy", "gymnastics", "ice palace")):
+        return ("Education and training", 0.6, "School or activity payment inferred")
+
+    if any(k in normalized for k in ("automatic payment", "payment thank you", "autopay")):
+        return ("Credit card payment and transfers", 0.95, "Account payment, not an expense")
+
+    if normalized.startswith("01/") or normalized.startswith("02/") or normalized.startswith("03/") or normalized.startswith("04/") or normalized.startswith("05/") or normalized.startswith("06/") or normalized.startswith("07/") or normalized.startswith("08/") or normalized.startswith("09/") or normalized.startswith("10/") or normalized.startswith("11/") or normalized.startswith("12/"):
+        return ("Statement parsing artifact", 0.95, "Likely statement line artifact - review extraction")
+
+    if "insurance" in normalized:
+        return ("Insurance and taxes", 0.72, "Insurance merchant inferred")
+
+    return None
