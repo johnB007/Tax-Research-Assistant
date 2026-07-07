@@ -54,42 +54,6 @@ This tool is for **education and research** only. It is **not legal, tax, or acc
 
 ![Tax Research Assistant project structure diagram](docs/diagrams/project-structure.svg)
 
-```
-Taxes/
-├── app.py                                  # Main Streamlit interface
-├── requirements.txt                        # Python dependencies (all versions pinned)
-├── config.json                             # User preferences (auto-created at startup)
-├── .env.example                            # OpenAI API key template
-├── LICENSE                                 # MIT license with tax disclaimer
-├── README.md                               # This file
-│
-├── tax_agent/
-│   ├── __init__.py
-│   ├── agent.py                           # Question answering with OpenAI integration
-│   ├── config.py                          # Settings loader (env, data paths)
-│   ├── expense_rules.py                   # 65+ vendor/keyword deduction rules
-│   ├── law_ingest.py                      # Web crawler, chunker, SQLite indexer
-│   ├── law_sources.py                     # Legal source import layer
-│   ├── retrieval.py                       # SQLite FTS5 search functions
-│   ├── states_config.py                   # Multi-state configuration framework
-│   └── statement_parser.py                # PDF/CSV/image parsing with OCR fallback
-│
-├── scripts/
-│   ├── refresh_law_index.py               # Python refresh runner
-│   └── refresh-tax-law-index.ps1          # PowerShell Task Scheduler wrapper
-│
-├── data/
-│   ├── law_index.db                       # SQLite FTS5 index (auto-created, 40MB+)
-│   ├── law_cache/                         # Downloaded pages (auto-created)
-│   │   ├── refresh_reports/               # JSON reports from refresh runs
-│   │   └── sources/                       # Cached HTML pages
-│   └── extracts/                          # Parsed statement CSVs (user-created)
-│
-├── .venv/                                 # Python virtual environment (do not commit)
-├── .gitignore                             # Excludes venv, db, cache, .env
-└── _tax-law-architect.agent.md            # VS Code agent definition (optional)
-```
-
 ## System requirements
 
 1. **OS**: Windows 10, Windows 11, or Windows Server 2019+
@@ -612,30 +576,6 @@ If you use VS Code Chat with GitHub Copilot or Claude:
 4. Ask tax questions in chat; answers include citations from the indexed sources
 
 This mode uses the same retrieval and LLM pipeline as the web app but within VS Code.
-
-## Architecture overview
-
-```
-User uploads statement or asks question
-              |
-              v
-        Streamlit app.py
-              |
-     +--------+--------+
-     |        |        |
-     v        v        v
-Statement  Expense   Q&A Agent
-Parser    Classifier   |
-  |          |        +----> SQLite FTS5
-  |          |        |      Retrieval
-  |          |        |
-  CSV        CSV      +----> OpenAI API
-                      |      (optional)
-                      |
-                      v
-                   Answer with
-                   citations
-```
 
 ## Performance characteristics
 
