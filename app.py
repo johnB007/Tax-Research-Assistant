@@ -237,6 +237,10 @@ with st.expander("2. Upload statements and extract possible business expenses", 
 
     if st.session_state.transactions:
         df = summarize_transactions(st.session_state.transactions)
+        st.caption(
+            "Negative amounts are credits, refunds, or card payments. "
+            "Use expense only totals for deduction review."
+        )
         st.dataframe(df, use_container_width=True)
 
         if not df.empty:
@@ -254,11 +258,18 @@ with st.expander("2. Upload statements and extract possible business expenses", 
                 value=True,
                 help="When on, totals include rows marked Deductible only.",
             )
+            expense_only_totals = st.checkbox(
+                "Category totals: expense spending only (exclude negatives)",
+                value=True,
+                help="When on, excludes negative amounts such as payments and credits.",
+            )
             totals_source = (
                 df[df["deductible_status"] == "Deductible"]
                 if deductible_only_totals
                 else df
             )
+            if expense_only_totals:
+                totals_source = totals_source[totals_source["amount"] > 0]
             totals = totals_source.groupby("category", dropna=False)["amount"].sum().reset_index()
             totals = totals.sort_values(by="amount", ascending=False)
             st.subheader("Category totals")
