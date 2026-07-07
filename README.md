@@ -65,6 +65,18 @@ streamlit run app.py
 
 App opens at `http://localhost:8501`
 
+### Quick reference after install
+
+Run this from PowerShell:
+
+```powershell
+cd <path-to-Tax-Research-Assistant>
+& .\.venv\Scripts\Activate.ps1
+python -m streamlit run app.py
+```
+
+Then open `http://localhost:8501`
+
 ### 4. Build the legal index
 
 On first run, click **Build law index** button. Takes 3-8 minutes (one time).
