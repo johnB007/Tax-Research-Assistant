@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "skills": {
+    "Tax Research Assistant": {
+      "source": "johnB007/Tax-Research-Assistant",
+      "sourceType": "github",
+      "skillPath": "SKILL.md",
+      "computedHash": "e84f9a0d8eab9d4ce7401332f9d86dd53aba2e691ca66764ff7bcb0189fb4066"
+    }
+  }
+}
