@@ -26,9 +26,7 @@
 
 ## Screenshots
 
-![Statement upload and expense categorization](docs/screenshots/statement-upload.png)
-
-![Tax Q&A with source citations](docs/screenshots/qa-interface.png)
+![Tax Research Assistant in action](docs/screenshots/app.png)
 
 ---
 
