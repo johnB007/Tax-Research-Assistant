@@ -145,12 +145,4 @@ State automatically appears in app dropdown. Rebuild index: `python scripts/refr
 
 ---
 
-## License
-
-MIT License with custom tax/legal disclaimer. See `LICENSE` file.
-
-Free to use and modify. No warranty. Always confirm tax treatment with a CPA or attorney before filing.
-
----
-
 **v1.0.0** (2026-07-07) — Initial release with SC + Federal law sources
