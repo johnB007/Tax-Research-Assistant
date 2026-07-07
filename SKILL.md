@@ -1,6 +1,10 @@
 ---
 name: Tax Research Assistant
 description: Full-text legal research agent for tax filing with 116k+ IRS and state law sources, statement parsing, expense categorization, and citation-backed Q&A. Works offline, no cloud dependencies.
+author: johnB007
+license: MIT
+homepage: https://github.com/johnB007/Tax-Research-Assistant
+repository: johnB007/Tax-Research-Assistant
 tags:
   - tax
   - research
@@ -20,9 +24,6 @@ agents:
   - windsurf
   - cline
   - vscode
-pricing: free
-github: johnB007/Tax-Research-Assistant
-docs: https://github.com/johnB007/Tax-Research-Assistant#readme
 ---
 
 # Tax Research Assistant
