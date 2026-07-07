@@ -249,7 +249,17 @@ with st.expander("2. Upload statements and extract possible business expenses", 
                 mime="text/csv",
             )
 
-            totals = df.groupby("category", dropna=False)["amount"].sum().reset_index()
+            deductible_only_totals = st.checkbox(
+                "Category totals: deductible transactions only",
+                value=True,
+                help="When on, totals include rows marked Deductible only.",
+            )
+            totals_source = (
+                df[df["deductible_status"] == "Deductible"]
+                if deductible_only_totals
+                else df
+            )
+            totals = totals_source.groupby("category", dropna=False)["amount"].sum().reset_index()
             totals = totals.sort_values(by="amount", ascending=False)
             st.subheader("Category totals")
             st.dataframe(totals, use_container_width=True)

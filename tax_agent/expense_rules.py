@@ -120,6 +120,14 @@ def classify_expense(description: str) -> tuple[str, float, str]:
     Longer, more specific keywords are checked first to avoid false positives.
     """
     normalized = _normalize_description(description)
+
+    # Card payment lines can include the token "mobile" which previously collided with "mobil" fuel keyword.
+    if (
+        "payment thank you" in normalized
+        or "thank you-mobile" in normalized
+        or "thank you mobile" in normalized
+    ):
+        return "Credit card payment and transfers", 0.98, "Card payment or transfer, not merchant spend"
     
     # First pass: Check for multi-word phrases and specific terms
     specific_terms = [
@@ -135,6 +143,8 @@ def classify_expense(description: str) -> tuple[str, float, str]:
     
     # Second pass: Check standard rules
     for rule in RULES:
+        if rule.keyword == "mobil" and "mobile" in normalized:
+            continue
         if rule.keyword in normalized:
             return rule.category, rule.confidence, rule.note
 

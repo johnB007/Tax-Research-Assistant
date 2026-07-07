@@ -348,4 +348,5 @@ def summarize_transactions(transactions: list[Transaction]) -> pd.DataFrame:
     ]
 
     df = pd.DataFrame(rows)
+    df = df.drop_duplicates(subset=["source_file", "date", "description", "amount"], keep="first")
     return df.sort_values(by=["category", "date"], ascending=[True, True])
