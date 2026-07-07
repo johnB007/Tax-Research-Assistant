@@ -26,12 +26,6 @@
 
 ---
 
-## Security
-
-Skills are routinely audited for malicious content. To report a security issue, visit [security.vercel.com](https://security.vercel.com/).
-
----
-
 ## Screenshots
 
 ![Tax Research Assistant in action](docs/screenshots/app.png)

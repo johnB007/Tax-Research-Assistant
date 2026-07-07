@@ -4,6 +4,8 @@ If you discover a security vulnerability, please email security concerns to the 
 
 Please do not publicly disclose the vulnerability until a fix is available.
 
+Skills are routinely audited for malicious content. To report a skills related security issue, visit [security.vercel.com](https://security.vercel.com/).
+
 ## Responsible disclosure
 
 1. Email details of the vulnerability
