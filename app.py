@@ -241,7 +241,16 @@ with st.expander("2. Upload statements and extract possible business expenses", 
             "Negative amounts are credits, refunds, or card payments. "
             "Use expense only totals for deduction review."
         )
-        st.dataframe(df, use_container_width=True)
+        expense_only_view = st.checkbox(
+            "Table view: expense spending only",
+            value=True,
+            help="Hides negative rows such as card payments, refunds, and credits in the table view.",
+        )
+        display_df = df
+        if expense_only_view:
+            display_df = display_df[display_df["amount"] > 0]
+
+        st.dataframe(display_df, use_container_width=True)
 
         if not df.empty:
             combined_path = _save_extract_csv(df, "combined", beside=destination)
