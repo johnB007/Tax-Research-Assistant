@@ -24,6 +24,14 @@
 
 ---
 
+## Screenshots
+
+![Statement upload and expense categorization](docs/screenshots/statement-upload.png)
+
+![Tax Q&A with source citations](docs/screenshots/qa-interface.png)
+
+---
+
 ## Project structure
 
 ![Tax Research Assistant project structure diagram](docs/diagrams/project-structure.svg)
