@@ -11,6 +11,9 @@ data/law_cache/*
 data/law_cache/refresh_reports/*
 !data/law_cache/refresh_reports/.gitkeep
 data/law_index.db
+data/law_index.db-shm
+data/law_index.db-wal
+data/law_index_refresh.db
 *.html
 
 # Local env
