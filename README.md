@@ -52,6 +52,8 @@ This tool is for **education and research** only. It is **not legal, tax, or acc
 
 ## Project structure
 
+![Tax Research Assistant project structure diagram](docs/diagrams/project-structure.svg)
+
 ```
 Taxes/
 ├── app.py                                  # Main Streamlit interface
