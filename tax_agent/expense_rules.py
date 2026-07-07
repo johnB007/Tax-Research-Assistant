@@ -157,10 +157,10 @@ def assess_deductibility(category: str, description: str) -> tuple[str, str]:
         return "Not deductible", "Medical spending is typically personal for business deduction purposes"
 
     if cat in {"meals and entertainment"}:
-        return "Partially deductible", "Meals may be limited to partial deduction and require business purpose"
+        return "Deductible", "Meals may be deductible with limits and business purpose documentation"
 
     if cat in {"charitable contributions", "general retail and miscellaneous"}:
-        return "Review", "Deductibility depends on business purpose and supporting records"
+        return "Not deductible", "Conservative default for mixed or personal type spend"
 
     likely_deductible = {
         "advertising and marketing",
@@ -184,15 +184,15 @@ def assess_deductibility(category: str, description: str) -> tuple[str, str]:
         "education and training",
     }
     if cat in likely_deductible:
-        return "Likely deductible", "Category is generally deductible with business purpose and documentation"
+        return "Deductible", "Category is generally deductible with business purpose and documentation"
 
     # Merchant-level hints for ambiguous categories.
     if any(k in normalized for k in ("gas", "fuel", "shell", "exxon", "chevron", "bp", "circle k")):
-        return "Likely deductible", "Fuel spend may be deductible for business mileage use"
+        return "Deductible", "Fuel spend may be deductible for business mileage use"
     if any(k in normalized for k in ("parking", "toll", "theparkingspot", "parkingmgt")):
-        return "Likely deductible", "Parking and tolls may be deductible for business travel"
+        return "Deductible", "Parking and tolls may be deductible for business travel"
 
-    return "Review", "Needs manual review for business purpose and tax treatment"
+    return "Not deductible", "Conservative default when business purpose is not clear"
 
 
 def _normalize_description(description: str) -> str:
