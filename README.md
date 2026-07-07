@@ -146,3 +146,10 @@ State automatically appears in app dropdown. Rebuild index: `python scripts/refr
 ---
 
 **v1.0.0** (2026-07-07) — Initial release with SC + Federal law sources
+
+---
+
+- [README](README.md)
+- [Contributing](CONTRIBUTING.md)
+- [MIT license](LICENSE)
+- [Security](SECURITY.md)
