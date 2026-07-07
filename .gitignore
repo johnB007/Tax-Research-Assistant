@@ -1,0 +1,17 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+
+# Local data and generated files
+data/uploads/*
+!data/uploads/.gitkeep
+data/law_cache/*
+!data/law_cache/.gitkeep
+data/law_cache/refresh_reports/*
+!data/law_cache/refresh_reports/.gitkeep
+data/law_index.db
+*.html
+
+# Local env
+.env

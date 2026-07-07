@@ -1,0 +1,7 @@
+{
+  "selected_states": ["SC"],
+  "filing_year": 2026,
+  "app_version": "1.0.0",
+  "last_updated": "2026-07-07",
+  "note": "State preference will be auto-selected on first run. Add state tax portal URLs in states_config.py when expanding to 50 states."
+}
