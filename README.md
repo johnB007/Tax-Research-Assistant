@@ -1,10 +1,10 @@
 # Tax Research Assistant
 
-**Local tax research for W2 + business household scenarios** — Statement parsing, expense categorization, and Q&A with source citations. Works offline, no cloud dependencies.
+**Local tax research for W2 + business household scenarios.** Statement parsing, expense categorization, and Q&A with source citations. Works offline, no cloud dependencies.
 
 Multi-state framework ready for 50+ states. Built with Streamlit, SQLite FTS5, and Tesseract OCR.
 
-**Status:** v1.0.0 — 116,516 indexed legal chunks from 2,742+ IRS and state tax sources.
+**Status:** v1.0.0. 116,516 indexed legal chunks from 2,742+ IRS and state tax sources.
 
 ---
 
@@ -14,15 +14,15 @@ Multi-state framework ready for 50+ states. Built with Streamlit, SQLite FTS5, a
 - **Expense categorization**: 65+ IRS Schedule C rules for business deductions
 - **Tax research**: Q&A with citations from indexed IRS and state law (SC + Federal included)
 - **Filing profile aware**: Answers tailored to filing year, W2 income, LLC, S Corp, and quarterly payment scenarios
-- **Local & private**: Run entirely offline — no cloud uploads, no telemetry
+- **Local and private**: Run entirely offline. No cloud uploads, no telemetry
 - **Multi-state ready**: Framework to add NY, TX, CA, etc. by configuration only
-- **LLM optional**: Works in retrieval-only mode; OpenAI integration for answer synthesis (not required)
+- **LLM optional**: Works in retrieval only mode. OpenAI integration for answer synthesis (not required)
 
 ---
 
 ## Important: This is research only
 
-This tool is for **education and research** only. It is **not legal, tax, or accounting advice**. Tax law changes annually. Always confirm dates, thresholds, and treatment with a licensed CPA or tax attorney before filing. Statements contain mixed transactions — final categorization requires professional review.
+This tool is for **education and research** only. It is **not legal, tax, or accounting advice**. Tax law changes annually. Always confirm dates, thresholds, and treatment with a licensed CPA or tax attorney before filing. Statements contain mixed transactions. Final categorization requires professional review.
 
 ---
 
@@ -32,7 +32,7 @@ This tool is for **education and research** only. It is **not legal, tax, or acc
 2. **Quarterly estimates**: Track and plan estimated tax payments
 3. **Business spend**: Upload credit card, bank, and payment processor statements
 4. **Deduction research**: Find IRS guidance on what's deductible, ordinary, and necessary
-5. **Multi-year filing**: Set filing year (2026, 2025, 2024, 2023) and get year-aware answers
+5. **Multi year filing**: Set filing year (2026, 2025, 2024, 2023) and get year aware answers
 
 ## What is included
 
@@ -48,7 +48,7 @@ This tool is for **education and research** only. It is **not legal, tax, or acc
 6. **Modular architecture** - Easy to add states, expense rules, or custom prompts.
 7. **Optional LLM integration** - Generate structured answers with OpenAI (requires API key, not mandatory).
 8. **Scheduled refresh capability** - Windows Task Scheduler integration for weekly index updates.
-9. **Custom agent mode** - VS Code agent definition for chat-based research workflow.
+9. **Custom agent mode** - VS Code agent definition for chat based research workflow.
 
 ## Project structure
 
@@ -265,7 +265,7 @@ Default: Checked
 
 ### Supported file types
 
-- **PDF**: Text-based PDFs from banks and credit card companies
+- **PDF**: Text based PDFs from banks and credit card companies
 - **CSV**: Comma-separated export from Quicken, accounting software, or bank downloads
 - **Images**: Scanned statements (PNG, JPG, TIFF) or PDFs with only images (no extractable text)
 
@@ -357,14 +357,14 @@ The parser applies 65+ rules to categorize transactions. Rules match:
 
 ### How answers are generated
 
-#### Mode 1: Retrieval-only (no OpenAI key)
+#### Mode 1: Retrieval only (no OpenAI key)
 
 1. App searches the SQLite index for matching legal chunks
 2. Returns top 5-10 results with source URLs
 3. Display format: "According to [source URL], [relevant excerpt]"
 4. **No LLM involved**: Purely from indexed legal text
 
-#### Mode 2: LLM-generated with citations (OpenAI API key required)
+#### Mode 2: LLM generated with citations (OpenAI API key required)
 
 1. App retrieves top matching legal chunks from the index
 2. Sends prompt to OpenAI GPT-4 (or GPT-4o depending on account)
