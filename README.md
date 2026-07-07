@@ -4,8 +4,6 @@
 
 116,516 indexed legal chunks from 2,742+ IRS and state tax sources. Built with Streamlit, SQLite FTS5, and Tesseract OCR.
 
-[![skills.sh](https://skills.sh/b/johnB007/Tax-Research-Assistant)](https://skills.sh/johnB007/Tax-Research-Assistant)
-
 ---
 
 ## Features
