@@ -145,6 +145,8 @@ def classify_expense(description: str) -> tuple[str, float, str]:
     for rule in RULES:
         if rule.keyword == "mobil" and "mobile" in normalized:
             continue
+        if rule.keyword == "bp" and "amazon" in normalized:
+            continue
         if rule.keyword in normalized:
             return rule.category, rule.confidence, rule.note
 
