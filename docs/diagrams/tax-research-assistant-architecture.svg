@@ -1,0 +1,110 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 700" width="1100" height="700" role="img" aria-labelledby="title desc">
+  <title id="title">_Tax-Research-Assistant_Agent Architecture</title>
+  <desc id="desc">Architecture flow for tax law ingestion, indexing, and answer generation with citations.</desc>
+  <defs>
+    <style>
+      .frame { fill:#0b1220; stroke:#1f2937; stroke-width:2; }
+      .band { fill:#0d1626; stroke:#1e3a5f; stroke-width:1.5; }
+      .panel { fill:#0b2a4a; stroke:#3b82f6; stroke-width:2; rx:12; }
+      .chip { fill:#051426; stroke:#3b82f6; stroke-width:1.5; rx:10; }
+      .focus { fill:#1e40af; stroke:#60a5fa; stroke-width:2; rx:12; }
+      .title { fill:#f1f5f9; font:700 28px ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, sans-serif; }
+      .subtitle { fill:#94a3b8; font:500 14px ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, sans-serif; }
+      .label { fill:#dbeafe; font:600 14px ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, sans-serif; }
+      .small { fill:#93c5fd; font:500 12px ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, sans-serif; }
+      .mono { fill:#bfdbfe; font:500 11px ui-monospace, Cascadia Mono, Consolas, monospace; }
+      .tier { fill:#64748b; font:600 12px ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, sans-serif; }
+      .legend { fill:#cbd5e1; font:500 12px ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, sans-serif; }
+      .foot { fill:#64748b; font:italic 12px ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, sans-serif; }
+    </style>
+    <marker id="arrowBlue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#60a5fa"/>
+    </marker>
+    <marker id="arrowGray" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#94a3b8"/>
+    </marker>
+  </defs>
+
+  <rect class="frame" x="10" y="10" width="1080" height="680" rx="14"/>
+  <text class="title" x="36" y="58">_Tax-Research-Assistant_Agent Data and Response Pipeline</text>
+  <text class="subtitle" x="36" y="82">Federal plus South Carolina authority ingestion with indexed citation grounded answers</text>
+
+  <rect class="band" x="28" y="106" width="1044" height="150" rx="12"/>
+  <text class="tier" x="42" y="128">1. Authority sources</text>
+
+  <rect class="chip" x="50" y="148" width="300" height="86"/>
+  <text class="label" x="66" y="176">IRS official guidance</text>
+  <text class="small" x="66" y="196">tax code regulations and guidance root</text>
+  <text class="mono" x="66" y="214">irs.gov privacy disclosure path</text>
+
+  <rect class="chip" x="380" y="148" width="300" height="86"/>
+  <text class="label" x="396" y="176">South Carolina DOR</text>
+  <text class="small" x="396" y="196">individual income tax pages and forms</text>
+  <text class="mono" x="396" y="214">dor.sc.gov iit</text>
+
+  <rect class="chip" x="710" y="148" width="330" height="86"/>
+  <text class="label" x="726" y="176">South Carolina code title 12</text>
+  <text class="small" x="726" y="196">statutory text and sub pages</text>
+  <text class="mono" x="726" y="214">scstatehouse.gov code title12</text>
+
+  <rect class="band" x="28" y="274" width="1044" height="158" rx="12"/>
+  <text class="tier" x="42" y="296">2. Ingestion and indexing</text>
+
+  <rect class="panel" x="70" y="318" width="300" height="94"/>
+  <text class="label" x="88" y="348">Crawler and parser</text>
+  <text class="small" x="88" y="368">requests plus BeautifulSoup plus PDF parsing</text>
+  <text class="mono" x="88" y="388">tax_agent/law_ingest.py</text>
+
+  <rect class="panel" x="400" y="318" width="300" height="94"/>
+  <text class="label" x="418" y="348">Chunking and normalization</text>
+  <text class="small" x="418" y="368">source hash change tracking and chunk ids</text>
+  <text class="mono" x="418" y="388">source_changes and law_chunks tables</text>
+
+  <rect class="panel" x="730" y="318" width="300" height="94"/>
+  <text class="label" x="748" y="348">SQLite FTS index</text>
+  <text class="small" x="748" y="368">law_index.db plus refresh swap fallback</text>
+  <text class="mono" x="748" y="388">FTS5 retrieval</text>
+
+  <rect class="band" x="28" y="448" width="1044" height="188" rx="12"/>
+  <text class="tier" x="42" y="470">3. Runtime answer path</text>
+
+  <rect class="focus" x="70" y="494" width="300" height="116"/>
+  <text class="label" x="88" y="526">Tax assistant runtime</text>
+  <text class="small" x="88" y="546">query plus filing profile plus timestamp context</text>
+  <text class="mono" x="88" y="566">tax_agent/agent.py</text>
+  <text class="mono" x="88" y="584">tax_agent/config.py</text>
+
+  <rect class="focus" x="400" y="494" width="300" height="116"/>
+  <text class="label" x="418" y="526">Response composer</text>
+  <text class="small" x="418" y="546">deduction reasoning with citation sections</text>
+  <text class="mono" x="418" y="566">timestamp first line requirement</text>
+  <text class="mono" x="418" y="584">authority scoped references</text>
+
+  <rect class="focus" x="730" y="494" width="300" height="116"/>
+  <text class="label" x="748" y="526">User output in app and chat mode</text>
+  <text class="small" x="748" y="546">organized tables and CPA prep sections</text>
+  <text class="mono" x="748" y="566">streamlit app plus architect mode</text>
+  <text class="mono" x="748" y="584">grounded citations</text>
+
+  <line x1="350" y1="191" x2="380" y2="191" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrowGray)"/>
+  <line x1="680" y1="191" x2="710" y2="191" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrowGray)"/>
+
+  <line x1="200" y1="234" x2="220" y2="318" stroke="#60a5fa" stroke-width="2.5" marker-end="url(#arrowBlue)"/>
+  <line x1="530" y1="234" x2="550" y2="318" stroke="#60a5fa" stroke-width="2.5" marker-end="url(#arrowBlue)"/>
+  <line x1="870" y1="234" x2="890" y2="318" stroke="#60a5fa" stroke-width="2.5" marker-end="url(#arrowBlue)"/>
+
+  <line x1="370" y1="365" x2="400" y2="365" stroke="#60a5fa" stroke-width="2.5" marker-end="url(#arrowBlue)"/>
+  <line x1="700" y1="365" x2="730" y2="365" stroke="#60a5fa" stroke-width="2.5" marker-end="url(#arrowBlue)"/>
+
+  <line x1="880" y1="412" x2="220" y2="494" stroke="#94a3b8" stroke-dasharray="8 6" stroke-width="2" marker-end="url(#arrowGray)"/>
+  <line x1="370" y1="552" x2="400" y2="552" stroke="#60a5fa" stroke-width="2.5" marker-end="url(#arrowBlue)"/>
+  <line x1="700" y1="552" x2="730" y2="552" stroke="#60a5fa" stroke-width="2.5" marker-end="url(#arrowBlue)"/>
+
+  <rect x="835" y="30" width="232" height="66" rx="10" fill="#051426" stroke="#3b82f6"/>
+  <line x1="850" y1="52" x2="900" y2="52" stroke="#60a5fa" stroke-width="2.5" marker-end="url(#arrowBlue)"/>
+  <text class="legend" x="910" y="56">Primary processing flow</text>
+  <line x1="850" y1="74" x2="900" y2="74" stroke="#94a3b8" stroke-width="2" stroke-dasharray="8 6" marker-end="url(#arrowGray)"/>
+  <text class="legend" x="910" y="78">Context feedback and metadata</text>
+
+  <text class="foot" x="36" y="670">Generated architecture artifact for tax mode docs and html preview rendering.</text>
+</svg>
