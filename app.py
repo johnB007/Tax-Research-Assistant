@@ -20,11 +20,23 @@ from tax_agent.statement_parser import (
 
 
 def _save_extract_csv(df: pd.DataFrame, source_stem: str, beside: Path | None = None) -> Path:
-    save_dir = beside.parent if beside is not None else (settings.data_dir / "extracts")
+    if beside is None:
+        save_dir = settings.data_dir / "extracts"
+    elif beside.suffix:
+        save_dir = beside.parent
+    else:
+        save_dir = beside
     save_dir.mkdir(parents=True, exist_ok=True)
     out_path = save_dir / f"{source_stem}_extracted.csv"
     df.to_csv(out_path, index=False)
     return out_path
+
+
+def _save_uploaded_file(file_obj, destination_dir: Path) -> Path:
+    destination_dir.mkdir(parents=True, exist_ok=True)
+    destination = destination_dir / Path(file_obj.name).name
+    destination.write_bytes(file_obj.read())
+    return destination
 
 settings = get_settings()
 
@@ -291,7 +303,63 @@ with st.expander("2. Upload statements and extract possible business expenses", 
                 key="dl_totals",
             )
 
-with st.expander("3. Ask tax questions with source citations", expanded=True):
+with st.expander("3. Upload 1040 and supporting tax documents", expanded=True):
+    st.write(
+        "Use this section for your final return, schedules, W2s, 1099s, brokerage forms, and any tax year support records. "
+        "Files are saved into a separate review folder so the agent can analyze them independently from card statements."
+    )
+    st.info(
+        "Recommended prompt: open docs/templates/1040-review-prompt.txt and paste it into the Tax Law Architect agent after upload."
+    )
+
+    tax_review_files = st.file_uploader(
+        "Upload 1040, schedules, W2s, 1099s, and supporting tax docs",
+        type=["pdf", "csv", "png", "jpg", "jpeg", "tif", "tiff"],
+        accept_multiple_files=True,
+        key="tax_review_uploads",
+    )
+
+    if tax_review_files:
+        review_upload_dir = settings.data_dir / "tax_review" / "uploads"
+        review_extract_dir = settings.data_dir / "tax_review" / "extracts"
+        review_transactions: list[Transaction] = []
+        for file in tax_review_files:
+            destination = _save_uploaded_file(file, review_upload_dir)
+            file_txns = parse_statement(destination)
+            review_transactions.extend(file_txns)
+
+            if file_txns:
+                per_file_df = summarize_transactions(file_txns)
+                saved_path = _save_extract_csv(per_file_df, Path(file.name).stem, beside=review_extract_dir)
+                st.caption(
+                    f"{file.name}: {len(file_txns)} extracted rows saved to {saved_path.relative_to(settings.project_root)}"
+                )
+            else:
+                st.caption(
+                    f"{file.name}: saved for review at {destination.relative_to(settings.project_root)}"
+                )
+
+        if review_transactions:
+            review_df = summarize_transactions(review_transactions)
+            review_path = _save_extract_csv(review_df, "tax_review_combined", beside=review_extract_dir)
+            st.success(
+                f"Review packet created with {len(review_df)} extracted rows and saved to {review_path.relative_to(settings.project_root)}"
+            )
+            st.dataframe(review_df, use_container_width=True)
+            st.download_button(
+                label="Download tax review CSV",
+                data=review_df.to_csv(index=False).encode("utf-8"),
+                file_name="tax_review_combined.csv",
+                mime="text/csv",
+                key="dl_tax_review",
+            )
+        else:
+            st.warning(
+                "Files were saved for review, but no transaction style rows were extracted. That is normal for many forms. "
+                "Use the prompt template with the Tax Law Architect agent to review the documents manually."
+            )
+
+with st.expander("4. Ask tax questions with source citations", expanded=True):
     default_prompt = (
         "What deductions might apply to LLC and S Corp spending for software, travel, and supplies, "
         "and how should W2 income and quarterly tax payments be handled?"
