@@ -1,0 +1,58 @@
+1040 Review Prompt for Tax Law Architect
+
+Use this after you upload your 2025 tax return documents and any supporting files.
+
+Context
+- Filing year:
+- Filing status:
+- State residency:
+- Business type:
+- LLC activity:
+- S Corp activity:
+- W2 income only for one spouse:
+- Quarterly estimates paid:
+
+Documents uploaded
+- Final Form 1040
+- Schedule 1
+- Schedule A
+- Schedule C
+- Schedule E
+- Form 8995 or 8995-A
+- State return
+- W2s
+- 1099s
+- Brokerage 1099s
+- Mortgage interest statement
+- HSA forms
+- Charity receipts
+- Business statements and receipts
+
+What I want reviewed
+1. What was missed on the 2025 return.
+2. What deductions may have been left on the table.
+3. What changed under 2026 tax law that I should know for next year.
+4. What items need CPA confirmation.
+5. What documents or records I should gather for a stronger return.
+
+Questions for the agent
+- What deductions look missing from my 2025 return?
+- Which items are likely deductible but need better support?
+- What should I have done differently to reduce taxable income legally?
+- What vehicle, home office, travel, software, or business expense items should be reviewed?
+- What records should I send to my CPA this year?
+- What changed in the new tax year that affects my deductions or filing position?
+
+Desired output format
+1. Household tax summary
+2. Potentially missed deductions
+3. Questions for CPA
+4. Documentation gaps
+5. Year over year changes
+6. Priority action list
+
+Notes
+- Do not assume every expense is deductible.
+- Flag anything mixed use or questionable.
+- Separate business, personal, and transfer activity.
+- Keep the answer practical so I can send it to my CPA.
