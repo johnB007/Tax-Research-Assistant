@@ -7,15 +7,21 @@ import streamlit as st
 
 import json
 
-from tax_agent.agent import FilingProfile, answer_tax_question
+from tax_agent.agent import FilingProfile, ReviewInput, answer_deduction_review, answer_tax_question, build_review_brief
 from tax_agent.config import get_settings
 from tax_agent.law_ingest import build_law_index, get_index_status, get_recent_source_changes
 from tax_agent.states_config import STATES_AVAILABLE, get_states_for_publication
 from tax_agent.statement_parser import (
+    TaxReturnSummary,
     Transaction,
     get_pdf_extraction_status,
+    parse_tax_form_line_items,
+    parse_tax_return_summary,
     parse_statement,
+    summarize_tax_form_coverage,
+    summarize_tax_form_line_items,
     summarize_transactions,
+    summarize_tax_return_summaries,
 )
 
 
@@ -106,6 +112,8 @@ if not settings.law_db_path.exists():
 
 if "transactions" not in st.session_state:
     st.session_state.transactions = []
+if "tax_review_root_dir" not in st.session_state:
+    st.session_state.tax_review_root_dir = str(settings.data_dir / "tax_review")
 
 index_status = get_index_status()
 last_crawled_at = index_status.get("last_crawled_at", "")
@@ -218,6 +226,10 @@ with st.expander("2. Upload statements and extract possible business expenses", 
             "Statement parsing ready: All tools available for PDF, CSV, and scanned document processing."
         )
 
+    review_root_dir = Path(st.session_state.tax_review_root_dir)
+    statements_upload_dir = review_root_dir / "Statements" / "uploads"
+    statements_extract_dir = review_root_dir / "Statements" / "extracts"
+
     uploaded_files = st.file_uploader(
         "Upload statements from Costco, Amazon, Chase, Amex, Wells Fargo, Bank of America, Apple Card, etc. (PDF, CSV, or scanned images)",
         type=["pdf", "csv", "png", "jpg", "jpeg", "tif", "tiff"],
@@ -227,14 +239,13 @@ with st.expander("2. Upload statements and extract possible business expenses", 
     if uploaded_files:
         parsed: list[Transaction] = []
         for file in uploaded_files:
-            destination = settings.uploads_dir / Path(file.name).name
-            destination.write_bytes(file.read())
+            destination = _save_uploaded_file(file, statements_upload_dir)
             file_txns = parse_statement(destination)
             parsed.extend(file_txns)
 
             if file_txns:
                 per_file_df = summarize_transactions(file_txns)
-                saved_path = _save_extract_csv(per_file_df, Path(file.name).stem, beside=destination)
+                saved_path = _save_extract_csv(per_file_df, Path(file.name).stem, beside=statements_extract_dir)
                 st.caption(
                     f"{file.name}: {len(file_txns)} transactions extracted "
                     f"| saved to {saved_path.relative_to(settings.project_root)}"
@@ -265,7 +276,7 @@ with st.expander("2. Upload statements and extract possible business expenses", 
         st.dataframe(display_df, use_container_width=True)
 
         if not df.empty:
-            combined_path = _save_extract_csv(df, "combined", beside=destination)
+            combined_path = _save_extract_csv(df, "combined", beside=statements_extract_dir)
             st.caption(f"Combined extract saved to {combined_path.relative_to(settings.project_root)}")
             st.download_button(
                 label="Download combined CSV",
@@ -303,14 +314,28 @@ with st.expander("2. Upload statements and extract possible business expenses", 
                 key="dl_totals",
             )
 
-with st.expander("3. Upload 1040 and supporting tax documents", expanded=True):
+with st.expander("1. Upload 1040 and supporting tax documents (Optional as this has no bearing on Deduction review brief for #4)", expanded=True):
     st.write(
         "Use this section for your final return, schedules, W2s, 1099s, brokerage forms, and any tax year support records. "
         "Files are saved into a separate review folder so the agent can analyze them independently from card statements."
     )
     st.info(
-        "Recommended prompt: open docs/templates/1040-review-prompt.txt and paste it into the Tax Law Architect agent after upload."
+        "Recommended prompt: open docs/templates/1040-review-prompt.txt and paste it into the _Tax-Research-Assistant_Agent after upload."
     )
+
+    review_root_dir_input = st.text_input(
+        "Save the full review packet in this folder",
+        value=st.session_state.tax_review_root_dir,
+        help="The agent can be pointed at this same folder after extraction is done.",
+        key="tax_review_root_dir",
+    )
+    review_root_dir = Path(review_root_dir_input)
+    tax_return_upload_dir = review_root_dir / "Tax Return" / "uploads"
+    tax_return_extract_dir = review_root_dir / "Tax Return" / "extracts"
+
+    st.caption(f"Active review root: {review_root_dir}")
+    st.caption(f"Tax upload folder: {tax_return_upload_dir}")
+    st.caption(f"Tax extract folder: {tax_return_extract_dir}")
 
     tax_review_files = st.file_uploader(
         "Upload 1040, schedules, W2s, 1099s, and supporting tax docs",
@@ -320,17 +345,27 @@ with st.expander("3. Upload 1040 and supporting tax documents", expanded=True):
     )
 
     if tax_review_files:
-        review_upload_dir = settings.data_dir / "tax_review" / "uploads"
-        review_extract_dir = settings.data_dir / "tax_review" / "extracts"
         review_transactions: list[Transaction] = []
+        return_summaries: list[TaxReturnSummary] = []
+        line_item_frames: list[pd.DataFrame] = []
+        processed_files = 0
         for file in tax_review_files:
-            destination = _save_uploaded_file(file, review_upload_dir)
+            processed_files += 1
+            destination = _save_uploaded_file(file, tax_return_upload_dir)
             file_txns = parse_statement(destination)
             review_transactions.extend(file_txns)
 
+            return_summary = parse_tax_return_summary(destination)
+            if return_summary is not None:
+                return_summaries.append(return_summary)
+
+            line_items_df = parse_tax_form_line_items(destination)
+            if not line_items_df.empty:
+                line_item_frames.append(line_items_df)
+
             if file_txns:
                 per_file_df = summarize_transactions(file_txns)
-                saved_path = _save_extract_csv(per_file_df, Path(file.name).stem, beside=review_extract_dir)
+                saved_path = _save_extract_csv(per_file_df, Path(file.name).stem, beside=tax_return_extract_dir)
                 st.caption(
                     f"{file.name}: {len(file_txns)} extracted rows saved to {saved_path.relative_to(settings.project_root)}"
                 )
@@ -339,9 +374,19 @@ with st.expander("3. Upload 1040 and supporting tax documents", expanded=True):
                     f"{file.name}: saved for review at {destination.relative_to(settings.project_root)}"
                 )
 
+            if return_summary is not None:
+                st.caption(
+                    f"{file.name}: {return_summary.form_type} key fields detected for filing year {return_summary.filing_year}."
+                )
+
+        st.info(
+            f"Processed {processed_files} file(s). Extracted {len(review_transactions)} transaction row(s), "
+            f"{len(return_summaries)} key field summary file(s), and {len(line_item_frames)} line item file(s)."
+        )
+
         if review_transactions:
             review_df = summarize_transactions(review_transactions)
-            review_path = _save_extract_csv(review_df, "tax_review_combined", beside=review_extract_dir)
+            review_path = _save_extract_csv(review_df, "tax_review_combined", beside=tax_return_extract_dir)
             st.success(
                 f"Review packet created with {len(review_df)} extracted rows and saved to {review_path.relative_to(settings.project_root)}"
             )
@@ -356,19 +401,176 @@ with st.expander("3. Upload 1040 and supporting tax documents", expanded=True):
         else:
             st.warning(
                 "Files were saved for review, but no transaction style rows were extracted. That is normal for many forms. "
-                "Use the prompt template with the Tax Law Architect agent to review the documents manually."
+                "Use the prompt template with the _Tax-Research-Assistant_Agent to review the documents manually."
+            )
+
+        if return_summaries:
+            returns_df = summarize_tax_return_summaries(return_summaries)
+            coverage_rows: list[dict[str, object]] = []
+            for item in return_summaries:
+                extracted, expected, missing = summarize_tax_form_coverage(item)
+                pct = round((extracted / expected) * 100, 1) if expected else 0.0
+                coverage_rows.append(
+                    {
+                        "source_file": item.source_file,
+                        "form_type": item.form_type,
+                        "coverage_extracted": extracted,
+                        "coverage_expected": expected,
+                        "coverage_pct": pct,
+                        "missing_fields": ", ".join(missing),
+                    }
+                )
+            coverage_df = pd.DataFrame(coverage_rows)
+            if not coverage_df.empty:
+                returns_df = returns_df.merge(
+                    coverage_df,
+                    on=["source_file", "form_type"],
+                    how="left",
+                )
+
+            overrides_path = tax_return_extract_dir / "tax_form_manual_overrides_template.csv"
+            if overrides_path.exists():
+                try:
+                    overrides_df = pd.read_csv(overrides_path)
+                    if not overrides_df.empty and {"source_file", "field_name", "override_value"}.issubset(overrides_df.columns):
+                        valid_overrides = overrides_df.copy()
+                        valid_overrides["override_value"] = valid_overrides["override_value"].astype(str).str.strip()
+                        valid_overrides = valid_overrides[
+                            valid_overrides["override_value"].ne("")
+                            & valid_overrides["override_value"].ne("nan")
+                        ]
+
+                        applied_count = 0
+                        for _, row in valid_overrides.iterrows():
+                            source_file = str(row["source_file"])
+                            field_name = str(row["field_name"])
+                            raw_value = str(row["override_value"])
+                            if field_name not in returns_df.columns:
+                                continue
+
+                            parsed_value: object = raw_value
+                            try:
+                                parsed_value = float(raw_value.replace(",", ""))
+                            except Exception:
+                                parsed_value = raw_value
+
+                            mask = returns_df["source_file"].astype(str) == source_file
+                            if mask.any():
+                                returns_df.loc[mask, field_name] = parsed_value
+                                applied_count += int(mask.sum())
+
+                        if applied_count > 0:
+                            st.info(
+                                f"Applied {applied_count} manual override value(s) from {overrides_path.relative_to(settings.project_root)}"
+                            )
+                except Exception:
+                    st.warning(
+                        "Manual override file was detected but could not be applied. "
+                        "Check tax_form_manual_overrides_template.csv formatting."
+                    )
+
+            returns_path = _save_extract_csv(returns_df, "tax_form_key_fields", beside=tax_return_extract_dir)
+            st.success(
+                f"Tax form key field summary saved to {returns_path.relative_to(settings.project_root)}"
+            )
+            st.subheader("Tax form key fields")
+            st.dataframe(returns_df, use_container_width=True)
+            st.download_button(
+                label="Download tax form key fields CSV",
+                data=returns_df.to_csv(index=False).encode("utf-8"),
+                file_name="tax_form_key_fields_extracted.csv",
+                mime="text/csv",
+                key="dl_tax_form_key_fields",
+            )
+        else:
+            st.warning(
+                "No structured key field summaries were detected from these files. "
+                "Use the line item extract below for manual CPA level review."
+            )
+
+        if line_item_frames:
+            all_line_items_df = summarize_tax_form_line_items(line_item_frames)
+            if not all_line_items_df.empty:
+                line_items_path = _save_extract_csv(
+                    all_line_items_df,
+                    "tax_form_line_items",
+                    beside=tax_return_extract_dir,
+                )
+                st.success(
+                    f"Tax form line item extraction saved to {line_items_path.relative_to(settings.project_root)}"
+                )
+                st.subheader("Tax form line items")
+                st.dataframe(all_line_items_df, use_container_width=True)
+                st.download_button(
+                    label="Download tax form line items CSV",
+                    data=all_line_items_df.to_csv(index=False).encode("utf-8"),
+                    file_name="tax_form_line_items_extracted.csv",
+                    mime="text/csv",
+                    key="dl_tax_form_line_items",
+                )
+        else:
+            st.error(
+                "No tax line items were extracted. Check scan quality and confirm the active review root path above matches your intended folder."
             )
 
 with st.expander("4. Ask tax questions with source citations", expanded=True):
+    has_openai_key = bool(settings.openai_api_key and settings.openai_api_key.strip())
+    if not has_openai_key:
+        st.warning(
+            "OPENAI_API_KEY is required for this section. Set it in your environment or .env file, then reload the app."
+        )
+
     default_prompt = (
-        "What deductions might apply to LLC and S Corp spending for software, travel, and supplies, "
-        "and how should W2 income and quarterly tax payments be handled?"
+        "What potentially missed deductions should I review first for my LLC and S Corp spending, "
+        "and how should W2 income and quarterly tax payments be handled under federal and South Carolina law?"
     )
     question = st.text_area("Ask your question", value=default_prompt, height=130)
 
-    if st.button("Answer question"):
+    if st.session_state.transactions:
+        st.subheader("Deduction review brief")
+        review_brief = build_review_brief(profile, st.session_state.transactions)
+        st.text_area(
+            "Paste this into the _Tax-Research-Assistant_Agent after upload",
+            value=review_brief,
+            height=260,
+        )
+
+        extracted_folder = st.session_state.tax_review_root_dir
+        st.info(f"Agent folder to review: {extracted_folder}")
+        review_input = ReviewInput(folder_path=extracted_folder, transactions=None)
+
+        if st.button("Run deduction review", disabled=not has_openai_key):
+            with st.spinner("Preparing deduction review from indexed legal sources."):
+                review_result = answer_deduction_review(
+                    None,
+                    profile=profile,
+                    review_input=review_input,
+                )
+
+            st.info(
+                f"Review folder set to: {extracted_folder}. The agent can load extracted CSV files from this folder when you switch to it."
+            )
+
+            st.subheader("Deduction review result")
+            if last_crawled_at:
+                st.write(f"Legal source crawl timestamp: {last_crawled_at}")
+            st.write(review_result.answer)
+
+            st.subheader("Deduction review citations")
+            if review_result.citations:
+                for citation in review_result.citations:
+                    st.write(citation)
+            else:
+                st.write("No citations available. Build the law index first.")
+
+    if st.button("Answer question", disabled=not has_openai_key):
         with st.spinner("Preparing answer from indexed legal sources."):
-            result = answer_tax_question(question, st.session_state.transactions, profile=profile)
+            result = answer_tax_question(
+                question,
+                None,
+                profile=profile,
+                review_input=review_input if st.session_state.transactions else None,
+            )
 
         st.subheader("Answer")
         if last_crawled_at:

@@ -125,7 +125,7 @@
     <rect class="file-item" x="570" y="520" width="500" height="110" rx="4"/>
     <text class="file-text" x="582" y="542">Other modules</text>
     <text class="file-desc" x="582" y="560">config.py (settings), law_sources.py (import layer), __init__.py</text>
-    <text class="file-desc" x="582" y="577">_tax-law-architect.agent.md (VS Code agent definition)</text>
+    <text class="file-desc" x="582" y="577">_Tax-Research-Assistant_Agent.agent.md (VS Code agent definition)</text>
 
     <rect class="file-item" x="570" y="650" width="500" height="110" rx="4"/>
     <text class="file-text" x="582" y="672">.venv / .gitignore</text>

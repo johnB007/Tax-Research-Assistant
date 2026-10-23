@@ -1,0 +1,47 @@
+[build-system]
+requires = ["setuptools>=65.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "tax-research-assistant"
+version = "1.0.0"
+description = "Tax preparation and PDF extraction assistant for CPA packet analysis"
+readme = "README.md"
+requires-python = ">=3.9"
+authors = [
+    {name = "Tax Research Assistant", email = "support@taxassistant.local"}
+]
+
+dependencies = [
+    "pypdf>=4.0.0",
+    "pandas>=2.0.0",
+    "numpy>=1.24.0",
+    "Pillow>=10.0.0",
+    "pytesseract>=0.3.10",
+    "rapidocr-onnxruntime>=1.2.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "black>=23.0.0",
+    "ruff>=0.1.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/jobarbar/Tax-Research-Assistant"
+Repository = "https://github.com/jobarbar/Tax-Research-Assistant"
+
+[tool.setuptools]
+packages = ["tax_agent"]
+
+[tool.setuptools.package-data]
+tax_agent = ["*.py"]
+
+[tool.black]
+line-length = 100
+target-version = ["py39"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py39"

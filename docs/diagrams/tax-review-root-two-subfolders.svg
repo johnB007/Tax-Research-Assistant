@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="620" viewBox="0 0 1100 620" role="img" aria-labelledby="title desc">
+  <title id="title">Tax Review Root Folder Structure</title>
+  <desc id="desc">Diagram showing one review root folder that contains Statements extracts and Tax Return extracts subfolders.</desc>
+  <defs>
+    <style>
+      .bg { fill: #0b1220; stroke: #1f2937; stroke-width: 2; }
+      .title { fill: #f1f5f9; font: 700 28px ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, sans-serif; }
+      .subtitle { fill: #94a3b8; font: 500 14px ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, sans-serif; }
+      .root { fill: #1e40af; stroke: #60a5fa; stroke-width: 2; rx: 14; }
+      .child { fill: #0b2a4a; stroke: #3b82f6; stroke-width: 2; rx: 12; }
+      .leaf { fill: #051426; stroke: #3b82f6; stroke-width: 1.5; rx: 10; }
+      .label { fill: #e2e8f0; font: 600 18px ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, sans-serif; }
+      .small { fill: #bfdbfe; font: 500 13px ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, sans-serif; }
+      .mono { fill: #dbeafe; font: 500 12px ui-monospace, Cascadia Mono, Consolas, monospace; }
+      .note { fill: #94a3b8; font: italic 12px ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, sans-serif; }
+      .line { stroke: #60a5fa; stroke-width: 2.5; }
+    </style>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#60a5fa" />
+    </marker>
+  </defs>
+
+  <rect class="bg" x="12" y="12" width="1076" height="596" rx="14" />
+  <text class="title" x="38" y="58">Review Root Folder With Two Extraction Subfolders</text>
+  <text class="subtitle" x="38" y="84">Set one root path once. Section 2 and section 3 write into child folders under the same root.</text>
+
+  <rect class="root" x="350" y="130" width="400" height="100" rx="14" />
+  <text class="label" x="388" y="173">Root folder</text>
+  <text class="mono" x="388" y="198">Tax-Research-Assistant\data\tax_review</text>
+
+  <line class="line" x1="470" y1="230" x2="300" y2="300" marker-end="url(#arrow)" />
+  <line class="line" x1="630" y1="230" x2="800" y2="300" marker-end="url(#arrow)" />
+
+  <rect class="child" x="100" y="300" width="380" height="130" rx="12" />
+  <text class="label" x="134" y="338">Statements</text>
+  <text class="small" x="134" y="362">Section 2 uploads bank and card statements</text>
+  <rect class="leaf" x="130" y="378" width="320" height="34" rx="10" />
+  <text class="mono" x="146" y="400">Statements\extracts\*.csv</text>
+
+  <rect class="child" x="620" y="300" width="380" height="130" rx="12" />
+  <text class="label" x="654" y="338">Tax Return</text>
+  <text class="small" x="654" y="362">Section 3 uploads 1040, W2, 1099, schedules</text>
+  <rect class="leaf" x="650" y="378" width="320" height="34" rx="10" />
+  <text class="mono" x="666" y="400">Tax Return\extracts\*.csv</text>
+
+  <rect class="leaf" x="230" y="470" width="640" height="66" rx="10" />
+  <text class="small" x="254" y="498">Agent input folder path: use only the root folder shown above</text>
+  <text class="mono" x="254" y="521">The agent reads both child extract folders under the same root path.</text>
+
+  <text class="note" x="38" y="580">Downloads from browser buttons can go to Downloads. Agent analysis still uses the root folder path and child extract folders.</text>
+</svg>

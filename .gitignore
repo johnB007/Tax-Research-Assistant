@@ -14,6 +14,8 @@ data/law_index.db
 data/law_index.db-shm
 data/law_index.db-wal
 data/law_index_refresh.db
+data/tax_review/
+*.egg-info/
 *.html
 
 # Local env

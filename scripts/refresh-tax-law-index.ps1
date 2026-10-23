@@ -1,6 +1,6 @@
 param(
     [string]$PythonPath = "python",
-    [string]$ProjectPath = "C:\Users\jobarbar\github\Taxes"
+     [string]$ProjectPath = "C:\path\to\Tax-Research-Assistant"
 )
 
 $ErrorActionPreference = "Stop"

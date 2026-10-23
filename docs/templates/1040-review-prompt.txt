@@ -1,4 +1,4 @@
-1040 Review Prompt for Tax Law Architect
+1040 Review Prompt for _Tax-Research-Assistant_Agent
 
 Use this after you upload your 2025 tax return documents and any supporting files.
 
